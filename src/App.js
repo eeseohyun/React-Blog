@@ -1,46 +1,33 @@
 import "./App.css";
-import { useState } from "react";
+import React, { useState } from "react";
+import Today from "react-live-clock";
 
 function App() {
-	let [글제목, 글제목변경] = useState([
-		"남자코트 추천",
-		"강남 우동 맛집",
-		"파이썬 독학",
-	]);
-	let [like, setLike] = useState([0, 0, 0]);
+	let [글제목, 글제목변경] = useState([]);
+	let [like, setLike] = useState([]);
 	let [modal, setModal] = useState(false);
 	let [title, setTitle] = useState(0);
 	let [post, setPost] = useState("");
-	let [postDate, setPostDate] = useState("");
-
-	const handleChange = () => {
-		let copy = [...글제목];
-		copy[0] = "여자코트 추천";
-		글제목변경(copy);
-	};
+	let [postDate, setPostDate] = useState([]);
 
 	const handlelisted = () => {
 		let copy = [...글제목];
 		글제목변경(copy.sort());
 	};
 
-	const postingDate = () => {
-		const date = new Date();
-		const year = date.getFullYear();
-		const month = date.getMonth();
-		const day = date.getDay();
-		return `${year}년 ${month}월 ${day}일`;
-	};
+	const today = <Today format={"YYYY년 MM월 DD일"} />;
+
 	return (
 		<div className="App">
 			<div className="nav-bar">
-				<h4>Blog</h4>
+				<h2>Blog</h2>
 			</div>
 			<button onClick={handlelisted}>정렬</button>
 			{글제목.map((a, i) => {
 				return (
 					<div className="list" key={i}>
 						<h4
+							className="title"
 							onClick={() => {
 								{
 									setModal(!modal);
@@ -52,45 +39,58 @@ function App() {
 							<span
 								onClick={(e) => {
 									e.stopPropagation();
-									let copyArr = [...like];
-									copyArr[i] = copyArr[i] + 1;
-									setLike(copyArr);
+									let likeCount = [...like];
+									likeCount[i]++;
+									setLike(likeCount);
 								}}
 							>
 								❤️
 							</span>
 							{like[i]}
 						</h4>
-						<button onClick={handleChange}>수정하기</button>
 						<button
 							onClick={() => {
 								let copy = [...글제목];
 								copy.splice(i, 1);
 								글제목변경(copy);
+								let likeArr = [...like];
+								likeArr.splice(i, 1);
+								setLike(likeArr);
+								let dateArr = [...postDate];
+								dateArr.splice(i, 1);
+								setPostDate(dateArr);
 							}}
 						>
 							삭제하기
 						</button>
-						<p>{postingDate}</p>
+						<p className="postDate">{postDate[i]}</p>
 					</div>
 				);
 			})}
-			<input
-				onChange={(e) => {
-					setPost(e.target.value);
-				}}
-			/>
-			<button
-				onClick={() => {
-					let copy = [...글제목];
-					copy.unshift(post);
-					글제목변경(copy);
-				}}
-			>
-				업로드
-			</button>
+			<div className="publish">
+				<input
+					onChange={(e) => {
+						setPost(e.target.value);
+					}}
+				/>
+				<button
+					onClick={() => {
+						let copy = [...글제목];
+						copy.unshift(post);
+						글제목변경(copy);
+						let likeArr = [...like];
+						likeArr.unshift("");
+						setLike(likeArr);
+						let dateArr = [...postDate];
+						dateArr.unshift(today);
+						setPostDate(dateArr);
+					}}
+				>
+					업로드
+				</button>
+			</div>
 			{modal == true ? (
-				<Modal title={title} 글제목={글제목} 함수={handleChange} />
+				<Modal title={title} 글제목={글제목} date={postDate} />
 			) : null}
 		</div>
 	);
@@ -100,9 +100,9 @@ function Modal(props) {
 	return (
 		<div className="modal">
 			<h4>{props.글제목[props.title]}</h4>
-			<p>날짜</p>
+			<p>{props.date[props.title]}</p>
 			<p>상세내용</p>
-			<button onClick={props.함수}>글 수정</button>
+			<button>글 수정</button>
 		</div>
 	);
 }

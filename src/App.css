@@ -4,7 +4,8 @@
 
 .nav-bar {
 	display: flex;
-	background-color: black;
+	justify-content: center;
+	background-color: #a9b645;
 	width: 100%;
 	color: white;
 	padding-left: 20px;
